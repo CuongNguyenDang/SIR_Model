@@ -1,2 +1,2 @@
 # SIR_Model
-Mathmatical Modeling Assignment
+Mathematical Modeling Assignment
