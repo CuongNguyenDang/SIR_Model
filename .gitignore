@@ -1,0 +1,11 @@
+# common
+.DS_Store
+*.pyc
+
+# ignore spyder files
+.spyproject
+__pycache__
+
+# ignore raw data
+covid19
+country2region
