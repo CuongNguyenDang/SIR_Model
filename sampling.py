@@ -17,14 +17,14 @@ def pgauss(x, y):
 
 
 def metropolis_hastings(p, iter=1000):
-    x, y = 0., 0.
+    beta, gamma = 0., 0.
     samples = np.zeros((iter, 2))
 
     for i in range(iter):
-        x_star, y_star = np.array([x, y]) + np.random.normal(size=2)
-        if np.random.uniform(0.0, 1.0) < p(x_star, y_star) / p(x, y):
-            x, y = x_star, y_star
-        samples[i] = np.array([x, y])
+        betaStar, gammaStar = np.array([beta, gamma]) + np.random.normal(size=2)
+        if np.random.uniform(0.0, 1.0) < p(betaStar, gammaStar) / p(beta, gamma):
+            beta, gamma = betaStar, gammaStar
+        samples[i] = np.array([beta, gamma])
 
     return samples
 
