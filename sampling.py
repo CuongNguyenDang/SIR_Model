@@ -26,6 +26,8 @@ def metropolis_hastings(p, iter):
                 samples[count] = np.array([beta, gamma])
                 count +=1
     return samples
-# samples = metropolis_hastings(circle,10000)
-# sns.jointplot(samples[:, 0], samples[:, 1])
-# plt.show()
+if __name__ == "__main__":
+    samples = metropolis_hastings(circle,10000)
+    sns.jointplot(samples[:, 0], samples[:, 1])
+    print(samples)
+    plt.show()
