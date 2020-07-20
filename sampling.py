@@ -1,7 +1,7 @@
 import numpy as np #ver 1.19.0
-import scipy.stats as st
-import seaborn as sns
-from matplotlib import pyplot as plt
+import scipy.stats as st #ver 1.5.1
+import seaborn as sns #ver 0.10.1
+from matplotlib import pyplot as plt #ver 3.2.2
 mus = np.array([0, 0])
 
 
