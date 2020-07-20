@@ -41,16 +41,19 @@ def approximate_lambda_v(s, i, r, n_bucket=5000):
     return (lambda_beta, v_beta), (lambda_gamma, v_gamma)
 
 
+def gamma_dist(x, alpha, beta):
+    return math.exp(alpha * math.log(beta) - special.loggamma(alpha) \
+            + (alpha - 1) * math.log(x) - beta * x)
+
+
 def pi_beta_gamma(beta,
                   gamma,
                   lambda_beta=1.1631,
                   v_beta=10.3343,
                   lambda_gamma=3.3453,
                   v_gamma=132.9341):
-    return math.exp(lambda_beta * math.log(v_beta) - special.loggamma(lambda_beta) \
-            + (lambda_beta - 1) * math.log(beta) - v_beta * beta \
-            + lambda_gamma * math.log(v_gamma) - special.loggamma(lambda_gamma) \
-            + (lambda_gamma - 1) * math.log(gamma) - v_gamma * gamma)
+    return gamma_dist(beta, lambda_beta, v_beta) \
+        * gamma_dist(gamma, lambda_gamma, v_gamma)
     
 
 if __name__ == "__main__":
