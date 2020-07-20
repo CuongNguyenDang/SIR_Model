@@ -1,4 +1,4 @@
-import numpy as np
+import numpy as np #ver 1.19.0
 import scipy.stats as st
 import seaborn as sns
 from matplotlib import pyplot as plt
