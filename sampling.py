@@ -19,15 +19,16 @@ def metropolis_hastings(p, iter):
     samples = np.zeros((iter, 2))
     count = 0
     while count < iter:
-        betaStar, gammaStar = np.array([beta, gamma]) + np.random.normal(size=2)
-        if betaStar>0 and gammaStar>0:
-            if np.random.uniform(0.0, 1.0) < p(betaStar, gammaStar) / p(beta, gamma):
-                beta, gamma = betaStar, gammaStar
+        beta_i, gamma_i = np.array([beta, gamma]) + np.random.normal(size=2)
+        if True or (beta_i > 0 and gamma_i > 0):
+            if np.random.uniform(0.0, 1.0) < p(beta_i, gamma_i) / p(beta, gamma):
+                beta, gamma = beta_i, gamma_i
                 samples[count] = np.array([beta, gamma])
                 count +=1
     return samples
+
 if __name__ == "__main__":
-    samples = metropolis_hastings(circle,10000)
+    samples = metropolis_hastings(pgauss,10000)
     sns.jointplot(samples[:, 0], samples[:, 1])
     print(samples)
     plt.show()
