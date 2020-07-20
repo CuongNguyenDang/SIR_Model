@@ -1,14 +1,12 @@
 """
 Collect data from git reposistory
-$python collect_data [region]
+$python regionize_data [region]
 """
-
 
 import pandas as pd
 import numpy as np
 import os
 import sys
-import time
 
 
 # covid-19
@@ -37,11 +35,6 @@ COUNTRY_TO_REGION_MAPPING_DIR = "country2region"
 COUNTRY_TO_REGION_MAPPING_FILE = "all/all.csv"
 
 
-SUSCEPTIBLE_FILE = "data/time_series_covid19_confirmed_global.csv"
-INFECTED_FILE = "data/time_series_covid19_confirmed_global.csv"
-RECOVERED_FILE = "data/time_series_covid19_deaths_global.csv"
-
-
 # WHAT: get latest raw data from repositories
 def fetchRepo():
     # get covid19 data
@@ -62,8 +55,10 @@ def fetchRepo():
     else:
         os.system(f"git clone {COUNTRY_TO_REGION_MAPPING_URL} {COUNTRY_TO_REGION_MAPPING_DIR}")
     
-    
-def convertRawData(region_as_index = True):
+
+# WHAT: convert raw data to SIR data
+# RET: S, I, R : pd.Series
+def convertRawData():
     # open all raw data file
     confirmed = pd.read_csv(COVID_19_DATA_DIR + "/" + COVID_19_CONFIRMED_FILE)
     death = pd.read_csv(COVID_19_DATA_DIR + "/" + COVID_19_DEATH_PATH_FILE)
@@ -156,6 +151,8 @@ def convertRawData(region_as_index = True):
 
 
 # WHAT: fetch S, I, R series for a specific region
+# RET: a specific region's data
+# ARG: region=None means Global
 def regionize(region="Europe"):
     fetchRepo()
     susceptible, infected, recovered = convertRawData()
@@ -173,6 +170,9 @@ def regionize(region="Europe"):
         
 
 if __name__ == '__main__':
-    for df in regionize():
-        print(df)
-    
+    if len(sys.argv) > 1:
+        for df in regionize(sys.argv[1]):
+            print(df)
+    else:
+        for df in regionize(None):
+            print(df)
