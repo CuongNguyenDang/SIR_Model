@@ -2,6 +2,7 @@ import numpy as np #ver 1.19.0
 import scipy.stats as st #ver 1.5.1
 import seaborn as sns #ver 0.10.1
 from matplotlib import pyplot as plt #ver 3.2.2
+from pi_beta_gamma import pi_beta_gamma
 mus = np.array([0, 0])
 
 
@@ -20,7 +21,7 @@ def metropolis_hastings(p, iter):
     count = 0
     while count < iter:
         beta_i, gamma_i = np.array([beta, gamma]) + np.random.normal(size=2)
-        if True or (beta_i > 0 and gamma_i > 0):
+        if beta_i > 0 and gamma_i > 0:
             if np.random.uniform(0.0, 1.0) < p(beta_i, gamma_i) / p(beta, gamma):
                 beta, gamma = beta_i, gamma_i
                 samples[count] = np.array([beta, gamma])
@@ -29,7 +30,7 @@ def metropolis_hastings(p, iter):
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(pgauss,10000)
+    samples = metropolis_hastings(pi_beta_gamma,10000)
     sns.jointplot(samples[:, 0], samples[:, 1])
     print(samples)
     plt.show()
