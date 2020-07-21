@@ -1,11 +1,12 @@
 import numpy as np
+from pandas import date_range
 from matplotlib import pyplot as plt
 from matplotlib.dates import DateFormatter, drange 
-import pylab
+from pylab import legend
 from datetime import datetime, timedelta
 import sys
 
-import euler
+from euler import euler_method, improved_euler_method
 
 def plot_data(s, i, r, t=None, t0=datetime(2020, 1, 22), dt=timedelta(days=1)):
     if t is None:
@@ -15,13 +16,10 @@ def plot_data(s, i, r, t=None, t0=datetime(2020, 1, 22), dt=timedelta(days=1)):
     ax.plot_date(t, i, 'r-o', label="Nhiễm bệnh") 
     ax.plot_date(t, r, 'b-x', label="Hồi phục")
     
-    fig.autofmt_xdate() 
-    ax.xaxis.set_major_formatter(DateFormatter('%m/%y'))
-    ax.xaxis.set_minor_formatter(DateFormatter('%d')) 
-    ax.fmt_xdata = DateFormatter('%S:%M:%H %d/%m/%y')
+    fig.autofmt_xdate()
     
     ax.set_title("Giá trị I, R thực")
-    pylab.legend(loc='upper left')
+    legend(loc='upper left')
     
     plt.show()
 
@@ -31,30 +29,36 @@ def plot_method(s0=796702206,
                 r0=0,
                 beta=0.1126,
                 gamma=0.0252,
+                t0=datetime(2020, 1, 22),
                 dt=timedelta(days=1),
-                nStep=None,
+                nStep=100,
                 t=None,
                 method="EulerMethod"):
     if method == "ImprovedEulerMethod":
-        method = euler.improved_euler_method
+        method = improved_euler_method
         methodName = "Euler mở rộng"
     else:
-        method = euler.euler_method
+        method = euler_method
         methodName = "Euler"
+        
+    if t is None:
+        t = drange(t0, t0 + (nStep + 1) * dt, dt)
     
-    s, i, r = method(s0, i0, r0, beta, gamma, dt, nStep)
+    s, i, r = np.rint(method(s0, i0, r0, beta, gamma, t)).astype(int)
     
     print("  {:} {: >15} {: >20} ".format("Ngày","Ca nhiễm","Ca hồi phục"))
-    for t, (i_t, r_t) in enumerate(zip(i, r)):
-        print("{:>5} {: >20} {: >20} ".format(t, i_t, r_t))
+    dates = date_range(t0, t0 + nStep * dt, nStep + 1)
+    for date, i_t, r_t in zip(dates, i, r):
+        print("{:>5} {: >20} {: >20} ".format(date.strftime("%d/%m"), i_t, r_t))
     
+    fig, ax = plt.subplots() 
+    ax.plot_date(t, i, 'r-o', label="Nhiễm bệnh")
+    ax.plot_date(t, r, 'b-x', label="Hồi phục")
     
-    t = np.linspace(0, dt*nStep, dt*nStep + 1)
-    plt.plot(t, i, 'r-o', label="Nhiễm bệnh")
-    plt.plot(t, r, 'b-x', label="Hồi phục")
+    fig.autofmt_xdate()
     
-    plt.title("Sử dụng giải thuật " + methodName + " để xấp xỉ các đại lượng I, R")
-    pylab.legend(loc='upper right')
+    ax.set_title("Sử dụng giải thuật " + methodName + " để xấp xỉ các đại lượng I, R")
+    legend(loc='upper left')
     
     plt.show()
     
