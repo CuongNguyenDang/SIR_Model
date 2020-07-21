@@ -48,20 +48,28 @@ if __name__ == "__main__":
     gamma_error = gamma_prime - gamma 
     #print(gamma_error)
 
-    s = random.choices(list(beta), k = 10000)
+    s = random.choices(list(beta), k = 1000000)
     #print(s)
     tmp1 = np.mean(s)
     tmp2 = np.var(s)
     scale = tmp2 / tmp1 
     shape = tmp1 / scale
-    print(scale, shape)
-    count, bins, ignored = plt.hist(s, 50, density=True)
-    print(bins)
+    print(shape, 1 / scale)
+    
+    s = random.choices(list(gamma), k = 1000000)
+    #print(s)
+    tmp1 = np.mean(s)
+    tmp2 = np.var(s)
+    scale = tmp2 / tmp1 
+    shape = tmp1 / scale
+    print(shape, 1 / scale)
+    # count, bins, ignored = plt.hist(s, 50, density=True)
+    # print(bins)
     #lny = (shape - 1) * np.log(bins) - bins / scale - np.log(sps.gamma(shape)*scale**shape)
     #y = np.exp(lny)
-    y = bins**(shape - 1)*(np.exp(-bins/scale) / (sps.gamma(shape)*scale**shape))
-    plt.plot(bins, y, linewidth=2, color='r')
-    plt.show()
+    # y = bins**(shape - 1)*(np.exp(-bins/scale) / (sps.gamma(shape)*scale**shape))
+    # plt.plot(bins, y, linewidth=2, color='r')
+    # plt.show()
     
     '''
     s = random.choices(list(gamma), k = 10000)

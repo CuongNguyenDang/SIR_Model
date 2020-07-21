@@ -2,7 +2,7 @@ import numpy as np #ver 1.19.0
 import scipy.stats as st #ver 1.5.1
 import seaborn as sns #ver 0.10.1
 from matplotlib import pyplot as plt #ver 3.2.2
-from pi_beta_gamma import pi_beta_gamma
+from pi_beta_gamma import f_beta_gamma
 mus = np.array([0, 0])
 
 
@@ -16,7 +16,7 @@ def pgauss(x, y):
 
 
 def metropolis_hastings(p, iter):
-    beta, gamma = 0.0212, 3.39 #The starting point of our Markov chain is the estimated value of (α, β) from Raggett (1982)?????
+    beta, gamma = 0.27 / 2.47, 0.19 / 7.58 #The starting point of our Markov chain is the estimated value of (α, β) from Raggett (1982)?????
     samples = np.zeros((iter, 2))
     count = 0
     while count < iter:
@@ -30,7 +30,7 @@ def metropolis_hastings(p, iter):
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(pi_beta_gamma,10000)
+    samples = metropolis_hastings(f_beta_gamma,10000)
     sns.jointplot(samples[:, 0], samples[:, 1])
     print(samples)
     plt.show()

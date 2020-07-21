@@ -1,16 +1,27 @@
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.dates import DateFormatter, drange 
 import pylab
+from datetime import datetime, timedelta
 import sys
 
 import euler
 
-def plot_data(s, i, r, t):
-    plt.plot(t, i, 'r-o', label="Nhiễm bệnh")
-    plt.plot(t, r, 'b-x', label="Hồi phục")
+def plot_data(s, i, r, t=None, t0=datetime(2020, 1, 22), dt=timedelta(days=1)):
+    if t is None:
+        t = drange(t0, t0 + s.shape[0] * dt, dt)
     
-    plt.title("Giá trị I, R thực")
-    pylab.legend(loc='upper right')
+    fig, ax = plt.subplots() 
+    ax.plot_date(t, i, 'r-o', label="Nhiễm bệnh") 
+    ax.plot_date(t, r, 'b-x', label="Hồi phục")
+    
+    fig.autofmt_xdate() 
+    ax.xaxis.set_major_formatter(DateFormatter('%m/%y'))
+    ax.xaxis.set_minor_formatter(DateFormatter('%d')) 
+    ax.fmt_xdata = DateFormatter('%S:%M:%H %d/%m/%y')
+    
+    ax.set_title("Giá trị I, R thực")
+    pylab.legend(loc='upper left')
     
     plt.show()
 
@@ -20,8 +31,9 @@ def plot_method(s0=796702206,
                 r0=0,
                 beta=0.1126,
                 gamma=0.0252,
-                dt=1,
-                nStep=400,
+                dt=timedelta(days=1),
+                nStep=None,
+                t=None,
                 method="EulerMethod"):
     if method == "ImprovedEulerMethod":
         method = euler.improved_euler_method

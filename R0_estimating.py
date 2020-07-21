@@ -9,6 +9,8 @@ from sampling import metropolis_hastings
 from sampling import circle
 from sampling import pgauss
 from regionize_data import regionize
+from pi_beta_gamma import gamma_dist
+
 # def read_csv(file_name):
 #     with open(file_name) as csv_file:
 #         l = []
@@ -28,17 +30,20 @@ from regionize_data import regionize
 # file_r = 'data/time_series_covid19_deaths_global.csv'
 
 
-s,i,r = regionize()
-x = [i+j for (i,j) in zip(i,r)]
-while x[0] == 0:
-    x.pop(0)
-samples = metropolis_hastings(circle,len(x))
-beta = samples[:,0]
-gamma = samples[:,1]
+s, i, r = regionize()
+x = [i + j for i, j in zip(i, r) if i + j != 0]
+
+samples = metropolis_hastings(circle, len(x))
+beta = samples[:, 0]
+gamma = samples[:, 1]
+
+print(sum(beta) / len(beta))
+print(sum(gamma) / len(gamma))
 E_R0 = 0
-for i in range(len(beta)):
+for b, c in zip(beta, gamma):
     pi = 1.
     for val in x:
-        pi *= math.exp(beta[i]*math.log(gamma[i]) - math.log(math.gamma(beta[i])) + (beta[i]-1)*math.log(val) - gamma[i]*val)
-    E_R0 += pi *beta[i]/gamma[i]
+        pi *= gamma_dist(val, b, c)
+    E_R0 += pi * b / c
+
 print(E_R0)
