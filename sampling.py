@@ -3,17 +3,15 @@ import scipy.stats as st #ver 1.5.1
 import seaborn as sns #ver 0.10.1
 from matplotlib import pyplot as plt #ver 3.2.2
 from pi_beta_gamma import pi_beta_gamma
-mus = np.array([0, 0])
 
+mus = np.array([0, 0])
 
 def circle(x, y):
     return (x-1)**2 + (y-2)**2 - 3**2
 
-
 def pgauss(x, y):
     # N(0,1)
     return st.multivariate_normal.pdf([x, y], mean=mus)
-
 
 def metropolis_hastings(p, iter):
     beta, gamma = 0.0212, 3.39 #The starting point of our Markov chain is the estimated value of (α, β) from Raggett (1982)?????
