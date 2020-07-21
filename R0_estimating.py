@@ -9,7 +9,7 @@ from sampling import metropolis_hastings
 from sampling import circle
 from sampling import pgauss
 from regionize_data import regionize
-from pi_beta_gamma import gamma_dist
+from gamma_dist import gamma_dist, f_beta_gamma
 
 # def read_csv(file_name):
 #     with open(file_name) as csv_file:
@@ -33,7 +33,7 @@ from pi_beta_gamma import gamma_dist
 s, i, r = regionize()
 x = [i + j for i, j in zip(i, r) if i + j != 0]
 
-samples = metropolis_hastings(circle, len(x))
+samples = metropolis_hastings(f_beta_gamma, 10000)
 beta = samples[:, 0]
 gamma = samples[:, 1]
 

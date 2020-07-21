@@ -176,10 +176,3 @@ if __name__ == '__main__':
     else:
         for df in regionize(None):
             print(df)
-            
-    # import plot
-    # import datetime
-    
-    # s, i, r = regionize()
-    # t = [datetime.datetime.strptime(date, "%m/%d/%y") for date in s.index.values][150:]
-    # plot.plot_data(s[150:], i[150:], r[150:], t)

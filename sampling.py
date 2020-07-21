@@ -2,7 +2,7 @@ import numpy as np #ver 1.19.0
 import scipy.stats as st #ver 1.5.1
 import seaborn as sns #ver 0.10.1
 from matplotlib import pyplot as plt #ver 3.2.2
-from pi_beta_gamma import f_beta_gamma
+from gamma_dist import f_beta_gamma
 mus = np.array([0, 0])
 
 
@@ -30,7 +30,7 @@ def metropolis_hastings(p, iter):
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(f_beta_gamma,10000)
+    samples = metropolis_hastings(f_beta_gamma, 10000)
     sns.jointplot(samples[:, 0], samples[:, 1])
     print(samples)
     plt.show()
