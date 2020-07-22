@@ -34,6 +34,9 @@ def metropolis_hastings(p, iter):
 
 if __name__ == "__main__":
     samples = metropolis_hastings(f_beta_gamma, 10000)
-    sns.jointplot(samples[:, 0], samples[:, 1])
+    h = sns.jointplot(samples[:, 0], samples[:, 1])
+    h.set_axis_labels(r'$\beta$',r'$\gamma$')
+    plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
+    plt.savefig('sampling.png')
     print(samples)
     plt.show()
