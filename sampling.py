@@ -26,6 +26,9 @@ def metropolis_hastings(p, iter):
                 beta, gamma = beta_i, gamma_i
                 samples[count] = np.array([beta, gamma])
                 count +=1
+            else:
+                samples[count] = np.array([beta, gamma])
+                count += 1
     return samples
 
 
