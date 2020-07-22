@@ -6,34 +6,15 @@ import math
 import pylab
 import csv
 from sampling import metropolis_hastings
-from sampling import circle
 from sampling import pgauss
 from regionize_data import regionize
 from gamma_dist import gamma_dist, f_beta_gamma
-
-# def read_csv(file_name):
-#     with open(file_name) as csv_file:
-#         l = []
-#         csv_reader = csv.reader(csv_file, delimiter=',')
-#         line_count = 0
-#         for row in csv_reader:
-#             if(line_count == 1):
-#                 l = list(map(int,row[4:]))
-#             elif(line_count >1):
-#                 int_row = list(map(int,row[4:]))
-#                 for i in range(len(int_row)):
-#                     l[i] += int_row[i]
-#             line_count +=1
-#     return l
-# #to test!!
-# file_i ='data/time_series_covid19_confirmed_global.csv'
-# file_r = 'data/time_series_covid19_deaths_global.csv'
 
 
 s, i, r = regionize()
 x = [i + j for i, j in zip(i, r) if i + j != 0]
 
-samples = metropolis_hastings(f_beta_gamma, 10000)
+samples = metropolis_hastings(f_beta_gamma, 10000, scale = [0.25,0.01])
 beta = samples[:, 0]
 gamma = samples[:, 1]
 
