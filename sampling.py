@@ -20,20 +20,25 @@ def metropolis_hastings(p, iter):
     samples = np.zeros((iter, 2))
     count = 0
     while count < iter:
-        beta_i, gamma_i = np.array([beta, gamma]) + np.random.normal(size=2)
+        #beta_i, gamma_i = np.array([beta, gamma]) + np.random.normal(size=2)
+        #beta_i, gamma_i = np.array([np.random.normal(loc=beta), np.random.normal(loc=gamma)])
+        beta_i, gamma_i = np.random.multivariate_normal(mean=[beta, gamma], cov=[[1,0],[0,1]])
         if beta_i > 0 and gamma_i > 0:
+            #tmp1 = st.multivariate_normal.pdf([beta_i, gamma_i], [beta, gamma], [[1,0],[0,1]])
+            #tmp2 = st.multivariate_normal.pdf([beta, gamma], [beta_i, gamma_i], [[1,0],[0,1]])
+            #if (tmp1 - tmp2) ** 2 > 1e-6:
+            #    print(tmp1, tmp2)
             if np.random.uniform(0.0, 1.0) < p(beta_i, gamma_i) / p(beta, gamma):
                 beta, gamma = beta_i, gamma_i
-                samples[count] = np.array([beta, gamma])
-                count +=1
-            else:
-                samples[count] = np.array([beta, gamma])
-                count += 1
+            samples[count] = np.array([beta, gamma])
+            count +=1
     return samples
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(f_beta_gamma, 10000)
+    samples = metropolis_hastings(f_beta_gamma, 100000)
     sns.jointplot(samples[:, 0], samples[:, 1])
     print(samples)
+    #print(np.mean(samples[:,0]) ** 2 / np.var(samples[:,0]))
+    #print(np.mean(samples[:,0]) / np.var(samples[:,0]))
     plt.show()
