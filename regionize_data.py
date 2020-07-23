@@ -170,9 +170,14 @@ def regionize(region="Europe"):
         
 
 if __name__ == '__main__':
-    if len(sys.argv) > 1:
-        for df in regionize(sys.argv[1]):
-            print(df)
-    else:
-        for df in regionize(None):
-            print(df)
+    # if len(sys.argv) > 1:
+    #     for df in regionize(sys.argv[1]):
+    #         print(df)
+    # else:
+    #     for df in regionize(None):
+    #         print(df)
+    
+    import plot
+    
+    s, i, r = regionize()
+    plot.plot_data(s, i, r)

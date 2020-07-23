@@ -3,7 +3,7 @@ import math
 
 
 def gamma_dist_var(x, alpha, beta):
-    return math.exp((alpha - 1) * math.log(x) - beta * x)
+    return math.exp((alpha - 1) * math.log(x) - beta * x) if x > 0 else 0
 
 
 def gamma_dist(x, alpha, beta):
@@ -17,11 +17,8 @@ def f_beta_gamma(beta,
                   v_beta=2.47,
                   lambda_gamma=0.19,
                   v_gamma=7.58):
-    if beta > 0 and gamma > 0:
-        return gamma_dist_var(beta, lambda_beta, v_beta) \
+    return gamma_dist_var(beta, lambda_beta, v_beta) \
             * gamma_dist_var(gamma, lambda_gamma, v_gamma)
-    else:
-        return 0
 
 
 def pi_beta_gamma(beta,

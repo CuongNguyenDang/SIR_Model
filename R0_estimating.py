@@ -12,19 +12,24 @@ from gamma_dist import gamma_dist, f_beta_gamma
 
 
 s, i, r = regionize()
-x = [i + j for i, j in zip(i, r) if i + j != 0]
+x = [0] + [i + j for i, j in zip(i, r) if i + j != 0]
+x = [x[i] - x[i - 1] for i in range(1, len(x)) if x[i] != x[i - 1]]
 
-samples = metropolis_hastings(f_beta_gamma, 10000, scale = [0.25,0.01])
+print(x)
+
+samples = metropolis_hastings(f_beta_gamma, 10000)
 beta = samples[:, 0]
 gamma = samples[:, 1]
 
-print(sum(beta) / len(beta))
-print(sum(gamma) / len(gamma))
-E_R0 = 0
+numerator = 0
+denominator = 0
 for b, c in zip(beta, gamma):
     pi = 1.
     for val in x:
         pi *= gamma_dist(val, b, c)
-    E_R0 += pi * b / c
+    print(b/c)
+    numerator += pi * b / c
+    denominator += pi
 
-print(E_R0)
+E_R0 = numerator / denominator
+print(numerator, denominator)

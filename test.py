@@ -4,6 +4,11 @@ import math
 import scipy.special as sps
 import random
 from regionize_data import regionize 
+# import numpy as np  # ver 1.19.0
+# import scipy.stats as st  # ver 1.5.1
+import seaborn as sns  # ver 0.10.1
+# from matplotlib import pyplot as plt  # ver 3.2.2
+# from gamma_dist import gamma_dist_var
 
 if __name__ == "__main__":
     S, I, R = regionize()
@@ -41,28 +46,35 @@ if __name__ == "__main__":
     #plt.show()
 
     beta_prime = np.array([(I[i] - I[i - 1] + gamma[i - 1] * I[i - 1]) * N \
-                 / (I[i - 1] * S[i - 1]) for i in range(1, n)])
+                  / (I[i - 1] * S[i - 1]) for i in range(1, n)])
     beta_error = beta_prime - beta 
     #print(beta_error)
     gamma_prime = np.array([(1 + beta[i - 1] * S[i - 1] / N - I[i] / I[i - 1]) for i in range(1, n)])
     gamma_error = gamma_prime - gamma 
     #print(gamma_error)
 
-    s = random.choices(list(beta), k = 1000000)
-    #print(s)
-    tmp1 = np.mean(s)
-    tmp2 = np.var(s)
+    beta = random.choices(list(beta), k = 1000000)
+    #print(beta)
+    tmp1 = np.mean(beta)
+    tmp2 = np.var(beta)
     scale = tmp2 / tmp1 
     shape = tmp1 / scale
     print(shape, 1 / scale)
     
-    s = random.choices(list(gamma), k = 1000000)
+    gamma = random.choices(list(gamma), k = 1000000)
     #print(s)
-    tmp1 = np.mean(s)
-    tmp2 = np.var(s)
+    tmp1 = np.mean(gamma)
+    tmp2 = np.var(gamma)
     scale = tmp2 / tmp1 
     shape = tmp1 / scale
     print(shape, 1 / scale)
+    
+    h = sns.jointplot(beta, gamma, kind='reg')  # 'kde')
+    h.set_axis_labels(r'$\beta$', r'$\gamma$')
+    plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
+    plt.savefig('sampling.png')
+    plt.show()
+    
     # count, bins, ignored = plt.hist(s, 50, density=True)
     # print(bins)
     #lny = (shape - 1) * np.log(bins) - bins / scale - np.log(sps.gamma(shape)*scale**shape)
@@ -98,3 +110,47 @@ if __name__ == "__main__":
     plt.plot(bins, y, linewidth=2, color='r')
     plt.show()
     '''
+    
+# import numpy as np  # ver 1.19.0
+# import scipy.stats as st  # ver 1.5.1
+# import seaborn as sns  # ver 0.10.1
+# from matplotlib import pyplot as plt  # ver 3.2.2
+# from gamma_dist import gamma_dist_var
+
+# def pgauss(x, y):
+#     # N(0,1)
+#     return st.multivariate_normal.pdf([x, y], mean=np.array([0, 0]))
+
+
+# def metropolis_hastings(p, nIter):
+#     x = 10
+#     samples = np.zeros(nIter)
+#     for idx in range(samples.shape[0]):
+#         x_star = np.random.normal(loc=x)
+        
+#         r = p(x_star) * st.norm.pdf(x, loc=x_star) \
+#             / p(x) / st.norm.pdf(x_star, loc=x)
+        
+#         if np.random.uniform(0.0, 1.0) < r:
+#             x = x_star
+            
+#         samples[idx] = np.array(x)
+
+#     return samples
+
+
+# if __name__ == "__main__":
+#     f = lambda x: gamma_dist_var(x, 0.27/2.47, 0.19/7.58)
+#     samples = metropolis_hastings(f, 100000)
+    
+#     h = sns.jointplot(samples, samples, kind='reg')  # 'kde')
+#     h.set_axis_labels(r'$\beta$', r'$\gamma$')
+#     plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
+#     plt.savefig('sampling.png')
+    
+#     #test
+#     print('='*60)
+#     print('x')
+#     print('samples:', np.mean(samples), '\t', np.var(samples))
+    
+#     plt.show()

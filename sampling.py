@@ -3,72 +3,87 @@ import scipy.stats as st  # ver 1.5.1
 import seaborn as sns  # ver 0.10.1
 from matplotlib import pyplot as plt  # ver 3.2.2
 from gamma_dist import f_beta_gamma
-
-def pgauss(x, y):
-    # N(0,1)
-    return st.multivariate_normal.pdf([x, y], mean=np.array([0, 0]))
+import sys
 
 
-def metropolis_hastings(p, nIter, scale=[1, 1]):
+def metropolis_hastings(x, f, nIter):
     """
-    Use Metropolis-Hastings algorithm to draw samples from probability distribution p
+    Metropolis algorithm to draw samples with known probability distribution
 
     Parameters
     ----------
-    p:     string
-        The desired probability distribution (we have 'pgauss' and 'f_beta_gama' distribution).
-    iter:  int
-        Size of sample set.
-    scale: 2D-array
-        "width" of the distribution.
+    x:        ndarry with size n
+        Initial state
+    f:        callable
+        Function proportional to the desired probability distribution
+    nIter:    int
+        Size of sample set
 
     Returns
     ------
-    out: ndarray
-         Samples stastify p distribution
+    out:      ndarray with size is nIter x n
+         Samples with desired probability distribution
     """
-    # The starting point of our Markov chain is the estimated value of (α, β) from Raggett (1982)?????
-    beta, gamma = 0.27 / 2.47, 0.19 / 7.58
-    samples = np.zeros((nIter, 2))
-    centre = [beta, gamma]
-    for idx in range(samples.shape[0]):
-        beta_star, gamma_star = np.random.multivariate_normal(mean=centre, cov=np.diag(scale))
+    
+    # Draw samples
+    samples = np.zeros((nIter, x.shape[0]))
+    for idx in range(nIter):
+        # Generate a candidate
+        x_star = np.random.multivariate_normal(mean=x, cov=np.diag([1] * x.shape[0]))
         
-        r = p(beta_star, gamma_star) * st.multivariate_normal.pdf([beta, gamma], mean=[beta_star, gamma_star], cov=np.diag(scale)) \
-            / p(beta, gamma) / st.multivariate_normal.pdf([beta_star, gamma_star], mean=centre, cov=np.diag(scale))
+        # Accept ratio
+        r = f(x_star) / f(x)
         
+        # Accept new state
         if np.random.uniform(0.0, 1.0) < r:
-            beta, gamma = beta_star, gamma_star        # accept beta_star,gamma_star
-        #     # uncomment this to plot accepted and injected points
-        #     plt.plot(beta_star,gamma_star,'b.')
-        # else: plt.plot(beta_star,gamma_star,'r.')
+            x = x_star
 
-        # inject beta_star,gamma_star
-        samples[idx] = np.array([beta, gamma])
+        # "Append" new state
+        samples[idx] = np.array(x)
 
-    print('Accept Rate = {0}%'.format(
-        len(np.unique(samples, axis=0)) / nIter*100))
-    # print(np.unique(samples,axis = 0))
     return samples
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(f_beta_gamma, 1000000)
-    h = sns.jointplot(samples[:, 0], samples[:, 1], kind='reg')  # 'kde')
-    h.set_axis_labels(r'$\beta$', r'$\gamma$')
-    plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
-    plt.savefig('sampling.png')
+    from gamma_dist import gamma_dist_var
     
-    #test
-    print('='*60)
-    print('beta')
-    print('exact  : {0} \t {1}'.format(0.27/2.47,0.27/2.47**2))
-    print('samples:', np.mean(samples[:,0]), '\t', np.var(samples[:,0]))
-    # print('='*60)
-
-    print('gamma')
-    print('exact  : {0} \t {1}'.format(0.19/7.58,0.19/7.58**2))
-    print('samples:', np.mean(samples[:,1]), '\t', np.var(samples[:,1]))
-    print('='*60)
-
-    plt.show()
+    if len(sys.argv) > 4:
+        # Interpret input
+        lambda_beta, v_beta, lambda_gamma, v_gamma = map(float, sys.argv[1:])
+        
+        # f is proportional to pi(beta, gamma)
+        f = lambda x: gamma_dist_var(x[0], lambda_beta, v_beta) \
+            * gamma_dist_var(x[1], lambda_gamma, v_gamma)
+        
+        # Draw samples
+        samples = metropolis_hastings(np.array([lambda_beta / v_beta, lambda_gamma / v_gamma]), f, 100000)
+        beta_samples = samples[:, 0]
+        gamma_samples = samples[:, 1]
+        
+        # Plot
+        h = sns.jointplot(samples[:, 0], samples[:, 1], kind='kde')
+        h.set_axis_labels(r'$\beta$', r'$\gamma$')
+        plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
+        
+        # Output capture
+        plt.savefig('sampling.png')
+        
+        # Compare means and variance
+        print('=' * 73)
+        
+        print('beta')
+        print('actual : mean: {:.4f}\t variance: {:.4f}'\
+              .format(lambda_beta / v_beta, lambda_beta / v_beta**2))
+        print('samples: mean: {:.4f}\t variance: {:.4f}'\
+              .format(np.mean(beta_samples), np.var(beta_samples)))
+    
+        print('gamma')
+        print('actual : mean: {:.4f}\t variance: {:.4f}'\
+              .format(lambda_gamma / v_gamma, lambda_gamma / v_gamma**2))
+        print('samples: mean: {:.4f}\t variance: {:.4f}'\
+              .format(np.mean(gamma_samples), np.var(gamma_samples)))
+        
+        print('=' * 73)
+    
+        # Show plot
+        plt.show()
