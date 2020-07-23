@@ -19,7 +19,7 @@ def metropolis_hastings(p, iter, scale=[1, 1]):
         The desired probability distribution (we have 'pgauss' and 'f_beta_gama' distribution).
     iter:  int
         Size of sample set.
-    scale: float or array_like of floats
+    scale: 2D-array
         "width" of the distribution.
 
     Returns
@@ -31,14 +31,15 @@ def metropolis_hastings(p, iter, scale=[1, 1]):
     beta, gamma = 0.27 / 2.47, 0.19 / 7.58
     samples = np.zeros((iter, 2))
     count = 0
+    centre = [beta,gamma]
     while count < iter:
         beta_star, gamma_star = np.random.multivariate_normal(
-            mean=[beta, gamma], cov=np.diag(scale))
-        r = p(beta_star, gamma_star) * st.multivariate_normal.pdf([beta, gamma], mean=[beta, gamma], cov=np.diag(scale)) / p(
-            beta, gamma) / st.multivariate_normal.pdf([beta_star, gamma_star], mean=[beta, gamma], cov=np.diag(scale))
+            mean = centre, cov=np.diag(scale))
+        r = p(beta_star, gamma_star) * st.multivariate_normal.pdf([beta, gamma], mean = centre, cov=np.diag(scale)) / p(
+            beta, gamma) / st.multivariate_normal.pdf([beta_star, gamma_star], mean = centre, cov=np.diag(scale))
         if np.random.uniform(0.0, 1.0) < r:
             beta, gamma = beta_star, gamma_star        # accept beta_star,gamma_star
-        #     # uncomment this (3 lines from here) to plot accepted and injected points
+        #     # uncomment this to plot accepted and injected points
         #     plt.plot(beta_star,gamma_star,'b.')
         # else: plt.plot(beta_star,gamma_star,'r.')
 
@@ -52,10 +53,22 @@ def metropolis_hastings(p, iter, scale=[1, 1]):
 
 
 if __name__ == "__main__":
-    samples = metropolis_hastings(f_beta_gamma, 10000, scale=[0.25, 0.01])
+    samples = metropolis_hastings(f_beta_gamma, 10000, scale=[0.2, 0.055])
     h = sns.jointplot(samples[:, 0], samples[:, 1], kind='reg')  # 'kde')
     h.set_axis_labels(r'$\beta$', r'$\gamma$')
     plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
     plt.savefig('sampling.png')
+    
+    #test
+    print('='*60)
+    print('beta')
+    print('exact  : {0} \t {1}'.format(0.27/2.47,0.27/2.47**2))
+    print('samples:', np.mean(samples[:,0]), '\t', np.var(samples[:,0]))
+    # print('='*60)
+
+    print('gamma')
+    print('exact  : {0} \t {1}'.format(0.19/7.58,0.19/7.58**2))
+    print('samples:', np.mean(samples[:,1]), '\t', np.var(samples[:,1]))
+    print('='*60)
 
     plt.show()
