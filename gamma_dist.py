@@ -2,13 +2,17 @@ from scipy import special
 import math
 
 
+def gamma_dist_exp(x, alpha, beta):
+    return alpha * math.log(beta) - special.loggamma(alpha) \
+            + (alpha - 1) * math.log(x) - beta * x if x > 0 else -math.inf
+
+
 def gamma_dist_var(x, alpha, beta):
     return math.exp((alpha - 1) * math.log(x) - beta * x) if x > 0 else 0
 
 
 def gamma_dist(x, alpha, beta):
-    return math.exp(alpha * math.log(beta) - special.loggamma(alpha) \
-            + (alpha - 1) * math.log(x) - beta * x)
+    return math.exp(gamma_dist_exp(x, alpha, beta))
 
 
 def f_beta_gamma(beta,

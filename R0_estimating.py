@@ -4,32 +4,35 @@ import seaborn as sns
 from matplotlib import pyplot as plt
 import math
 import pylab
-import csv
 from sampling import metropolis_hastings
-from sampling import pgauss
 from regionize_data import regionize
-from gamma_dist import gamma_dist, f_beta_gamma
+from gamma_dist import gamma_dist_exp, f_beta_gamma
 
 
 s, i, r = regionize()
-x = [0] + [i + j for i, j in zip(i, r) if i + j != 0]
-x = [x[i] - x[i - 1] for i in range(1, len(x)) if x[i] != x[i - 1]]
+x = np.array([x + y for x, y in zip(i, r) if x + y != 0])
 
-print(x)
+samples = metropolis_hastings(np.array([.1, .025]),
+                              lambda x: f_beta_gamma(x[0], x[1]),
+                              10000)
 
-samples = metropolis_hastings(f_beta_gamma, 10000)
-beta = samples[:, 0]
-gamma = samples[:, 1]
+beta = np.array(samples[:, 0])
+gamma = np.array(samples[:, 1])
 
-numerator = 0
-denominator = 0
-for b, c in zip(beta, gamma):
-    pi = 1.
-    for val in x:
-        pi *= gamma_dist(val, b, c)
-    print(b/c)
-    numerator += pi * b / c
-    denominator += pi
+denom = np.array([sum([gamma_dist_exp(val, b, c) for val in x]) for b, c in zip(beta, gamma)])
+numer = denom * np.array([math.log(b / c) for b, c in zip(beta, gamma)])
 
-E_R0 = numerator / denominator
-print(numerator, denominator)
+max_numer = np.amax(numer)
+max_denom = np.amax(denom)
+
+numer = numer[numer > max_numer - 20]
+denom = denom[denom > max_denom - 20]
+
+numer -= np.array([max_numer - 10] * numer.shape[0])
+denom -= np.array([max_denom - 10] * denom.shape[0])
+
+numer = sum([math.exp(x) for x in numer])
+denom = sum([math.exp(x) for x in denom])
+
+R0 = numer / denom
+print(R0)
