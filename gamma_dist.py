@@ -1,5 +1,4 @@
-import numpy as np
-from scipy import stats, special
+from scipy import special
 import math
 
 
@@ -18,10 +17,11 @@ def f_beta_gamma(beta,
                   v_beta=2.47,
                   lambda_gamma=0.19,
                   v_gamma=7.58):
-    if beta > 0 and gamma > 0 and gamma < 1:
+    if beta > 0 and gamma > 0:
         return gamma_dist_var(beta, lambda_beta, v_beta) \
             * gamma_dist_var(gamma, lambda_gamma, v_gamma)
-    else: return -1
+    else:
+        return 0
 
 
 def pi_beta_gamma(beta,
