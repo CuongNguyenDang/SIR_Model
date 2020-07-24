@@ -50,40 +50,43 @@ if __name__ == "__main__":
     if len(sys.argv) > 4:
         # Interpret input
         lambda_beta, v_beta, lambda_gamma, v_gamma = map(float, sys.argv[1:])
-        
-        # f is proportional to pi(beta, gamma)
-        f = lambda x: gamma_dist_var(x[0], lambda_beta, v_beta) \
-            * gamma_dist_var(x[1], lambda_gamma, v_gamma)
-        
-        # Draw samples
-        samples = metropolis_hastings(np.array([lambda_beta / v_beta, lambda_gamma / v_gamma]), f, 100000)
-        beta_samples = samples[:, 0]
-        gamma_samples = samples[:, 1]
-        
-        # Plot
-        h = sns.jointplot(samples[:, 0], samples[:, 1], kind='kde')
-        h.set_axis_labels(r'$\beta$', r'$\gamma$')
-        plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
-        
-        # Output capture
-        plt.savefig('sampling.png')
-        
-        # Compare means and variance
-        print('=' * 73)
-        
-        print('beta')
-        print('actual : mean: {:.4f}\t variance: {:.4f}'\
-              .format(lambda_beta / v_beta, lambda_beta / v_beta**2))
-        print('samples: mean: {:.4f}\t variance: {:.4f}'\
-              .format(np.mean(beta_samples), np.var(beta_samples)))
+    else:
+        lambda_beta,v_beta = 0.27,2.47
+        lambda_gamma,v_gamma = 0.19,7.58    
+    # f is proportional to pi(beta, gamma)
+    f = lambda x: gamma_dist_var(x[0], lambda_beta, v_beta) \
+        * gamma_dist_var(x[1], lambda_gamma, v_gamma)
     
-        print('gamma')
-        print('actual : mean: {:.4f}\t variance: {:.4f}'\
-              .format(lambda_gamma / v_gamma, lambda_gamma / v_gamma**2))
-        print('samples: mean: {:.4f}\t variance: {:.4f}'\
-              .format(np.mean(gamma_samples), np.var(gamma_samples)))
-        
-        print('=' * 73)
+
+    # Draw samples
+    samples = metropolis_hastings(np.array([lambda_beta / v_beta, lambda_gamma / v_gamma]), f, 100000)
+    beta_samples = samples[:, 0]
+    gamma_samples = samples[:, 1]
     
-        # Show plot
-        plt.show()
+    # Plot
+    h = sns.jointplot(samples[:, 0], samples[:, 1], kind='kde')
+    h.set_axis_labels(r'$\beta$', r'$\gamma$')
+    plt.suptitle('Lấy mẫu bằng Metropolis-Hastings')
+    
+    # Output capture
+    plt.savefig('sampling.png')
+    
+    # Compare means and variance
+    print('=' * 73)
+    
+    print('beta')
+    print('actual : mean: {:.4f}\t variance: {:.4f}'\
+            .format(lambda_beta / v_beta, lambda_beta / v_beta**2))
+    print('samples: mean: {:.4f}\t variance: {:.4f}'\
+            .format(np.mean(beta_samples), np.var(beta_samples)))
+
+    print('gamma')
+    print('actual : mean: {:.4f}\t variance: {:.4f}'\
+            .format(lambda_gamma / v_gamma, lambda_gamma / v_gamma**2))
+    print('samples: mean: {:.4f}\t variance: {:.4f}'\
+            .format(np.mean(gamma_samples), np.var(gamma_samples)))
+    
+    print('=' * 73)
+
+    # Show plot
+    plt.show()
