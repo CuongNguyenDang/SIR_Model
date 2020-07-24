@@ -20,7 +20,7 @@ beta = np.array(samples[:, 0])
 gamma = np.array(samples[:, 1])
 
 denom = np.array([sum([gamma_dist_exp(val, b, c) for val in x]) for b, c in zip(beta, gamma)])
-numer = denom * np.array([math.log(b / c) for b, c in zip(beta, gamma)])
+numer = denom + np.array([math.log(b / c) for b, c in zip(beta, gamma)])
 
 max_numer = np.amax(numer)
 max_denom = np.amax(denom)
@@ -34,5 +34,5 @@ denom -= np.array([max_denom - 10] * denom.shape[0])
 numer = sum([math.exp(x) for x in numer])
 denom = sum([math.exp(x) for x in denom])
 
-R0 = numer / denom
+R0 = numer / denom * math.exp(max_numer - max_denom)
 print(R0)
