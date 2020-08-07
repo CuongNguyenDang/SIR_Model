@@ -15,7 +15,7 @@ def euler_step(s0, i0, r0, beta, gamma, dt):
 
 def euler_method(s0, i0, r0, beta, gamma, t):
     """
-    Approximate S, I, R in time range t
+    Approximate S, I, R in time range t.
     
     Parameters
     ----------
@@ -31,7 +31,6 @@ def euler_method(s0, i0, r0, beta, gamma, t):
         Probability of an infectious individual recovering
     t:       array of float with size n
         Concerned points in time
-
 
     Returns
     ------
