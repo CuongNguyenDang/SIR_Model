@@ -35,8 +35,15 @@ COUNTRY_TO_REGION_MAPPING_DIR = "country2region"
 COUNTRY_TO_REGION_MAPPING_FILE = "all/all.csv"
 
 
-# WHAT: get latest raw data from repositories
 def fetchRepo():
+    """
+    Get latest raw data from repositories.
+
+    Returns
+    -------
+    None.
+
+    """
     # get covid19 data
     if os.path.isdir(COVID_19_DATA_DIR):
         os.system(f"cd {COVID_19_DATA_DIR} & git pull")
@@ -56,9 +63,28 @@ def fetchRepo():
         os.system(f"git clone {COUNTRY_TO_REGION_MAPPING_URL} {COUNTRY_TO_REGION_MAPPING_DIR}")
     
 
-# WHAT: convert raw data to SIR data
-# RET: S, I, R : pd.Series
-def convertRawData():
+def convertRawData(model='SIR'):
+    """
+    Convert raw data to a specified model's data format.
+
+    Parameters
+    ----------
+    model : string, optional
+        The model to convert raw data to.
+        The default is 'SIR'.
+        Can recognize 'SIR', 'SIRD'.
+        None for Raw/Original.
+
+    Returns
+    -------
+    out : tuple of pd.Series-es
+        Data in the specified model's format.
+
+    """
+    
+    # get latest raw data
+    fetchRepo()
+    
     # open all raw data file
     confirmed = pd.read_csv(COVID_19_DATA_DIR + "/" + COVID_19_CONFIRMED_FILE)
     death = pd.read_csv(COVID_19_DATA_DIR + "/" + COVID_19_DEATH_PATH_FILE)
@@ -140,44 +166,100 @@ def convertRawData():
     recovered = recovered.groupby("Country/Region").last()
     population = population.groupby("Country_Region").last()
     
+    
+    model = model.upper()
+    
     # make data suited to use in SIR model
-    recovered = recovered + death
-    infected = confirmed - recovered
-    susceptible = pd.concat([population] * len(infected.columns), axis=1)
-    susceptible.columns = infected.columns
-    susceptible = susceptible - confirmed
-    
-    return susceptible, infected, recovered
-
-
-# WHAT: fetch S, I, R series for a specific region
-# RET: a specific region's data
-# ARG: region=None means Global
-def regionize(region="Europe"):
-    fetchRepo()
-    susceptible, infected, recovered = convertRawData()
-    
-    if region:
-        susceptible = susceptible.loc[region]
-        infected = infected.loc[region]
-        recovered = recovered.loc[region]
-    else:
-        susceptible = susceptible.sum()
-        infected = infected.sum()
-        recovered = recovered.sum()
+    if model == 'SIR':
+        recovered = recovered + death
+        infectious = confirmed - recovered
+        susceptible = pd.concat([population] * len(infectious.columns), axis=1)
+        susceptible.columns = infectious.columns
+        susceptible = susceptible - confirmed
         
-    return susceptible, infected, recovered
+        return susceptible, infectious, recovered
+    
+    # make data suited to use in SIRD model
+    if model == 'SIRD':
+        infectious = confirmed - recovered - death
+        susceptible = pd.concat([population] * len(infectious.columns), axis=1)
+        susceptible.columns = infectious.columns
+        susceptible = susceptible - confirmed
         
+        return susceptible, infectious, recovered, death
+    
+    return confirmed, death, recovered
 
-if __name__ == '__main__':
-    # if len(sys.argv) > 1:
-    #     for df in regionize(sys.argv[1]):
-    #         print(df)
-    # else:
-    #     for df in regionize(None):
-    #         print(df)
+
+def regionize(region='Europe', model='SIR'):
+    """
+    Fetch data for a specific model for a specific region.
+
+    Parameters
+    ----------
+    region : string, optional
+        The country/region to fetch data about.
+        The default is 'Europe'.
+        None for All/Global.
+        
+    model : string, optional
+        The model to convert raw data to.
+        The default is 'SIR'.
+        Can recognize 'SIR', 'SIRD'.
+        None for Raw/Original.
+
+    Returns
+    -------
+    out : tuple of pd.Series-es
+        Data of the specified region in the specified model's format.
+
+    """
     
-    import plot
+    model = model.upper()
     
-    s, i, r = regionize()
-    plot.plot_data(s, i, r)
+    if model == 'SIR':
+        susceptible, infectious, recovered = convertRawData(model='SIR')
+    
+        if region:
+            susceptible = susceptible.loc[region]
+            infectious = infectious.loc[region]
+            recovered = recovered.loc[region]
+        else:
+            susceptible = susceptible.sum()
+            infectious = infectious.sum()
+            recovered = recovered.sum()
+            
+        return susceptible, infectious, recovered
+    
+    if model == 'SIRD':
+        susceptible, infectious, recovered, death = convertRawData(model='SIRD')
+    
+        if region:
+            susceptible = susceptible.loc[region]
+            infectious = infectious.loc[region]
+            recovered = recovered.loc[region]
+            death = death.loc[region]
+        else:
+            susceptible = susceptible.sum()
+            infectious = infectious.sum()
+            recovered = recovered.sum()
+            death = death.sum()
+            
+        return susceptible, infectious, recovered, death
+
+    return convertRawData(model=None)
+
+
+# if __name__ == '__main__':
+#     # if len(sys.argv) > 1:
+#     #     for df in regionize(sys.argv[1]):
+#     #         print(df)
+#     # else:
+#     #     for df in regionize(None):
+#     #         print(df)
+    
+#     import plot
+    
+#     s, i, r, d = regionize(model='sird')
+#     plot.plot_data(s, i, r)
+#     print(d)
