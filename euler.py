@@ -10,7 +10,7 @@ def dSIR(s, i, r, beta, gamma, dt):
                      gamma * i]) * dt
 
 
-def dSIRD(s, i, r, d, beta, gamma, muy, dt):
+def dSIRD(s, i, r, d, beta, gamma, mu, dt):
     """
     Define dS(t), dI(t), dR(t) and dD(t) in SIR-epidemic model
     with vital dynamics and constant population (SIRD for short).
@@ -18,9 +18,9 @@ def dSIRD(s, i, r, d, beta, gamma, muy, dt):
     
     N = s + i + r + d
     return np.array([-beta / N * i * s,
-                     beta / N  * i * s - (gamma+muy) * i,
+                     beta / N  * i * s - (gamma+mu) * i,
                      gamma * i,
-                     muy * i]) * dt
+                     mu * i]) * dt
 
 
 def euler_step(x0, t0, dx, dt):
