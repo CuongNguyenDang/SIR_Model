@@ -200,8 +200,7 @@ def regionize(region='Europe', model='SIR'):
     region : string, optional
         The country/region to fetch data about.
         The default is 'Europe'.
-        None for All/Global.
-        
+        None for All/Global.    
     model : string, optional
         The model to convert raw data to.
         The default is 'SIR'.

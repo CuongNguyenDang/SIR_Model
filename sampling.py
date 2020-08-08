@@ -12,17 +12,17 @@ def metropolis_hastings(x, f, nIter):
 
     Parameters
     ----------
-    x:        ndarry with size n
-        Initial state
-    f:        callable
-        Function proportional to the desired probability distribution
-    nIter:    int
-        Size of sample set
+    x : ndarry with size n (type T)
+        Initial state.
+    f : callable, (T) -> float
+        Function proportional to the desired probability distribution.
+    nIter : int
+        Size of sample set.
 
     Returns
     ------
-    out:      ndarray with size nIter x n
-         Samples with desired probability distribution
+    samples : ndarray with size nIter x n
+         Samples with desired probability distribution.
     """
     
     # Draw samples
